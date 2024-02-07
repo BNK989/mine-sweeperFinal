@@ -14,21 +14,18 @@ const EMPTY = {
 let gBoard = []
 let gClicks = 0
 let gLives = 3
-
-//let gRecInterval
-
-const gNumbers = []
 let gStartTime = Date.now()
-const gModal = document.querySelector(".modal")
-//let gInterval;
-const gNextMoveElm = document.querySelector("span.next-num")
-const gElTime = document.querySelector(".timer")
+
 const gJsConfetti = new JSConfetti()
+const gModal = document.querySelector(".modal")
+const gElTime = document.querySelector(".timer")
+
 let gBestScore = {
     16: Infinity,
     25: Infinity,
     36: Infinity
 }
+
 let gCurrLevel = 16
 
 function init(field,mines){
@@ -46,7 +43,6 @@ function init(field,mines){
 
     gClicks = 0
     gLives = 3
-    //if(gRecInterval) clearInterval(gRecInterval)
 }
 
 function createMines(field = 16, mines = 2){
@@ -110,6 +106,7 @@ function play(elm,iPos,jPos){
     const cell = gBoard[iPos][jPos]
     if(cell.isOpen) return
     if(cell.isFlagged) return
+    cell.isOpen = true
     
     switch (cell.type){
         case MINE.type:
@@ -128,7 +125,7 @@ function play(elm,iPos,jPos){
                 var nbrCount = totalMines(iPos,jPos)
                 if(!elm.classList) elm = document.querySelector(`#p${iPos}at${jPos}`)
                 elm.classList.add("open")
-                cell.isOpen = true
+                //cell.isOpen = true
                 if (nbrCount > 0) {
                     elm.innerHTML = `<div class="has-${nbrCount}-neighbors">${nbrCount}</div>`
                 } else {
@@ -221,10 +218,7 @@ function lose(){
     //clearInterval(gInterval)
 }
 
-
-///OLD...==================================================OLD=========OLD=========OLD=========OLD=========OLD=========OLD=========OLD=========OLD=========OLD=====
-
-
+//======================================================================================//
 
 function runTimer(){
     gStartTime = Date.now()
@@ -245,7 +239,7 @@ function win(){
     const time = +timer()
     //clearInterval(gInterval)
     gJsConfetti.addConfetti()
-    modalTitle.innerText = 'DONE! in: ' + time + 's'
+    modalTitle.innerText = 'DONE! in: ' + time + 's'// and X moves
     gModal.showModal()
 
     if (time < gBestScore[gCurrLevel])  newBest(time) 

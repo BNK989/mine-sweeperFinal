@@ -172,10 +172,9 @@ button:active{
     justify-content: center;
 }
 
-dialog{
+dialog {
     border-radius: 9px;
-    background-color: #fff7ec;
-    width: 240px;
+    height: 30vh;
 }
 
 button.exit {
@@ -209,4 +208,8 @@ p {
 .time-to-beat {
     margin-top: 8px;
     display: none;
+}
+
+footer {
+    margin: 390px 0 0;
 }
