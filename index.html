@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/media/visuals/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
+    <script defer src="/scripts/utils.js"></script>
+    <script defer src="/scripts/script.js"></script>
+    <title>Mind Sweeper</title>
+</head>
+<body onload="init(16,2)">
+    <div class="container">
+        <div class="header-container">
+            <h1 class="title">MIND SWEEPER</h1>
+        </div>
+        <div class="score-container">
+            <div class="level-container">
+                <h2>Game level:</h2>
+                <button class="level-picker" title="Easy" onclick="init(16,2)">Privet</button>
+                <button class="level-picker" title="Medium" onclick="init(64,14)">Lieutenant </button>
+                <button class="level-picker" title="Hard" onclick="init(144,32)">Admiral</button>
+            </div>
+            <div class="stats">
+                <p class="next-num">Next number: <span class="next-num">1</span></p>
+                <p class="time">Time: <span class="timer">00</span>s</p>
+            </div>
+        </div>
+        <div class="time-to-beat">Time to beat <span class="best-time">10</span>s</div>
+        <div class="game-container">
+            <table>
+                <tr><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+                <tr><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+                <tr><td>9</td><td>10</td><td>11</td><td>12</td></tr>
+                <tr><td>13</td><td>14</td><td>15</td><td>16</td></tr>
+            </table>
+        </div>
+        <div class="btn-container">
+        </div>
+        <footer>
+            <div><p>created by Ben Klinovsky</p></div>
+        </footer>
+    </div>
+
+    <dialog class="end-game modal">
+        <div class="container">
+            <button class="exit" title="close" onclick="closeModal()">X</button>
+            <h3>Game Over</h3>
+            <h4>Play Again</h4>
+            <div class="level-container">
+                <button class="level-picker" title="Easy" onclick="init(16,2)">Privet</button>
+                <button class="level-picker" title="Medium" onclick="init(64,14)">Lieutenant </button>
+                <button class="level-picker" title="Hard" onclick="init(144,32)">Admiral</button>
+                
+            </div>
+        </div>
+    </dialog>
+    
+</body>
+</html>
