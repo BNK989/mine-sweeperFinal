@@ -15,12 +15,12 @@ let gBoard = []
 let gClicks = 0
 let gLives = 3
 
-let gRecInterval
+//let gRecInterval
 
 const gNumbers = []
 let gStartTime = Date.now()
 const gModal = document.querySelector(".modal")
-let gInterval;
+//let gInterval;
 const gNextMoveElm = document.querySelector("span.next-num")
 const gElTime = document.querySelector(".timer")
 const gJsConfetti = new JSConfetti()
@@ -46,7 +46,7 @@ function init(field,mines){
 
     gClicks = 0
     gLives = 3
-    if(gRecInterval) clearInterval(gRecInterval)
+    //if(gRecInterval) clearInterval(gRecInterval)
 }
 
 function createMines(field = 16, mines = 2){
@@ -128,11 +128,11 @@ function play(elm,iPos,jPos){
                 var nbrCount = totalMines(iPos,jPos)
                 if(!elm.classList) elm = document.querySelector(`#p${iPos}at${jPos}`)
                 elm.classList.add("open")
+                cell.isOpen = true
                 if (nbrCount > 0) {
                     elm.innerHTML = `<div class="has-${nbrCount}-neighbors">${nbrCount}</div>`
                 } else {
-                    gRecInterval = setInterval(clearArea,150,iPos,jPos)
-                return
+                    clearArea(iPos,jPos)//,150,iPos,jPos)
                 
             }
             break
@@ -140,9 +140,9 @@ function play(elm,iPos,jPos){
                 console.error('issue')
             } 
             
-        cell.isOpen = true
+        
         gClicks++
-        if(gRecInterval) clearInterval(gRecInterval)
+        //if(gRecInterval) clearInterval(gRecInterval)
 }
 
 function clearArea(iPos,jPos){
@@ -218,7 +218,7 @@ function lose(){
     new Audio("./media/wrong.wav").play()
     modalTitle.innerText = 'Game Over'
     gModal.showModal()
-    clearInterval(gInterval)
+    //clearInterval(gInterval)
 }
 
 
@@ -228,7 +228,7 @@ function lose(){
 
 function runTimer(){
     gStartTime = Date.now()
-    gInterval = setInterval(timer,30)
+    //gInterval = setInterval(timer,30)
 }
 
 function timer(){
@@ -243,7 +243,7 @@ function timer(){
 function win(){
     const modalTitle = document.querySelector(".modal .container h3")
     const time = +timer()
-    clearInterval(gInterval)
+    //clearInterval(gInterval)
     gJsConfetti.addConfetti()
     modalTitle.innerText = 'DONE! in: ' + time + 's'
     gModal.showModal()
