@@ -13,9 +13,9 @@ const gGame = {
     flaggedCount: 0,
     elapseTime: 0,
     levels: [{
-     isCurrent: true, name: 'Privet', function: init(16,2), difficulty: 'Easy' },
-    {isCurrent: false, name: 'Lieutenant', function: init(64,14), difficulty: 'Medium' },
-    {isCurrent: false, name: 'Admiral', function: init(144,32), difficulty: 'Hard' }]
+     isCurrent: true, name: 'Privet', function: 'init(16,2)', difficulty: 'Easy' },
+    {isCurrent: false, name: 'Lieutenant', function: 'init(64,14)', difficulty: 'Medium' },
+    {isCurrent: false, name: 'Admiral', function: 'init(144,32)', difficulty: 'Hard' }]
 }
 
 const gBestScore = {
