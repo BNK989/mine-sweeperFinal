@@ -81,9 +81,14 @@ body{
     }
 }
 
+p.level-name {
+    font-family: 'Stick No Bills', monospace;
+    letter-spacing: 4px;
+}
+
 .live-data {
     border: 2px solid black;
-    width: 100px;
+    width: 140px;
     height: 25px;
     display: flex;
     justify-content: center;
@@ -95,8 +100,9 @@ p.small-title {
 }
 
 .live-data > p {
-    font-family: 'Major Mono Display', monospace;
     font-weight: 600;
+    font-family: 'Stick No Bills';
+    letter-spacing: 3px;    
 }
 
 .smily {

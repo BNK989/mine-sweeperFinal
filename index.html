@@ -15,7 +15,7 @@
 
     <title>Mine Sweeper</title>
 </head>
-<body onload="init(16,2)">
+<body onload="init(16,2,true)">
     <div class="head-futures">
         <p onclick="openModal()">Select level</p>
         |
@@ -39,17 +39,17 @@
                         <p class="level-name">000</p>
                     </div>
                 </div>
-                <div class="smily" title="RESTART">😀</div>
+                <div class="smily" title="RESTART" onclick="init(16,2,true)">😀</div>
                 <div class="timer">
                     <p class="small-title">timer</p>
                     <div class="live-data">
                         <p class="time-elapsed">00:00</p>
                     </div>
                 </div>
-                <div class="life-reminning">
+                <div class="life-left">
                     <p class="small-title">life</p>
                     <div class="live-data">
-                        <p class="life-reminning">3</p>
+                        <p class="life-left">3</p>
                     </div>
                 </div>
             </div>
@@ -75,7 +75,7 @@
             <button class="exit" title="close" onclick="closeModal()">X</button>
             <h3>Game Over</h3>
             <p class="talk"></p>
-            <h4>Play Again</h4>
+            <!-- <h4>Play Again</h4> -->
             <div class="level-container">
                 <button class="level-picker" title="Easy" onclick="init(16,2)">Privet</button>
                 <button class="level-picker" title="Medium" onclick="init(64,14)">Lieutenant </button>
@@ -85,6 +85,7 @@
         </div>
     </dialog>
     <script defer src="scripts/utils.js"></script>
+    <script defer src="scripts/stats-area.js"></script>
     <script defer src="scripts/script.js"></script>
 </body>
 </html>

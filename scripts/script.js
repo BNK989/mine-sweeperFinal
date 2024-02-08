@@ -13,23 +13,18 @@ const gGame = {
     flaggedCount: 0,
     elapseTime: 0,
     levels: [{
-     isCurrent: true, name: 'Privet', function: 'init(16,2)', difficulty: 'Easy' },
-    {isCurrent: false, name: 'Lieutenant', function: 'init(64,14)', difficulty: 'Medium' },
-    {isCurrent: false, name: 'Admiral', function: 'init(144,32)', difficulty: 'Hard' }]
+     isCurrent: true, name: 'Privet', field: 16, mines: 2, difficulty: 'Easy', bestTime: Infinity },
+    {isCurrent: false, name: 'Lieutenant', field: 64, mines: 14, difficulty: 'Medium', bestTime: Infinity },
+    {isCurrent: false, name: 'Admiral', field: 144, mines: 32, difficulty: 'Hard', bestTime: Infinity }]
 }
+const gClicks = {level: 0, total: 0}
 
-const gBestScore = {
-    16: Infinity,
-    25: Infinity,
-    36: Infinity
-}
 
 const MINE = 'M'
 const EMPTY = 'E'
 const FLAG = '🚩'
 
 let gBoard = []
-let gClicks = 0
 let gLives = 3
 let gTimerInterval
 let gStartTime = Date.now()
@@ -37,25 +32,32 @@ let gStartTime = Date.now()
 const gJsConfetti = new JSConfetti()
 const gModal = document.querySelector(".modal")
 
+addRightClickFunctionality()
 
-
-let gCurrLevel = 16
-
-function init(field,mines){
+function init(field,mines,fullReset = false){
     CELL.isMine = false
     gGame.isOn = true
     gGame.shownCount = 0
     gGame.flaggedCount = 0
-    gGame.level = field
-    gClicks = 0
+    gClicks.level = 0
     closeModal()
-    clearInterval(gTimerInterval)
-
+    if(fullReset) doReset()
+    if(gGame.levels[0].isCurrent) clearInterval(gTimerInterval)
+    
     gBoard = createBoardFromArray(createMines(field,mines))
     renderTable(gBoard)
-    addMineCount()
-    addRightClickFunctionality()
+    addMineCount()//ads nbr count to each cell
+
+    setLevelName()
     
+}
+
+function doReset(){
+    gClicks.total = 0
+    gGame.levels[0].isCurrent = true
+    gGame.levels[1].isCurrent = gGame.levels[2].isCurrent = false
+    gLives = 3
+
 }
 
 function addRightClickFunctionality(){
@@ -140,13 +142,14 @@ function play(elm,iPos,jPos){
     const currCell = gBoard[iPos][jPos]
     if(currCell.isOpen) return
     if(currCell.isFlagged) return
+    if(!gGame.isOn) return
     currCell.isOpen = true
     gGame.shownCount++
-    if(gClicks < 1) runTimer()
+    if(gClicks.level < 1 ) runTimer()
     
     if (currCell.isMine){
             elm.classList.add("open")
-            if(gClicks < 1 || gGame.shownCount <= 1){
+            if(gClicks.level < 1 || gGame.shownCount <= 1){
                 oops(elm,iPos,jPos)
                 console.log('oops')
                 return
@@ -167,7 +170,7 @@ function play(elm,iPos,jPos){
                 checkWin()
         }
             
-        gClicks++
+        gClicks.level++
 }
 
 function clearArea(iPos,jPos){
@@ -198,8 +201,8 @@ function flag(elm){
         checkWin()
      }
 
-     if(gClicks < 1 )  runTimer()
-     gClicks++
+     if(gClicks.level < 1 )  runTimer()
+     gClicks.level++
 
 }
 
@@ -238,6 +241,8 @@ function checkLose(){
         lose()
     } else {
         gLives--
+        document.querySelector('p.life-left').innerText = gLives
+        checkWin()
     }
 }
 
@@ -275,14 +280,34 @@ function win(){
     const modalTalk = document.querySelector(".dialog-container .talk")
     const modalButtons = document.querySelector(".dialog-container .level-container")
     const time = timer()
-    //clearInterval(gInterval)
-    modalTitle.innerText = 'At ease soldier'
+
+    const currLevelIdx = gGame.levels.findIndex((level)=> level.isCurrent)
+    gGame.levels[currLevelIdx].isCurrent = false
+    if (currLevelIdx === gGame.levels.length - 1 ){
+        finishGame(modalTitle,modalTalk,modalButtons,time)
+        return
+    } 
+    const currLevel = gGame.levels[currLevelIdx + 1]
+    currLevel.isCurrent = true
+    modalTitle.innerText = 'At ease ' + gGame.levels[currLevelIdx].name
     modalTalk.innerText = 'You\'ve cleared the field in ' + time + '\nyou may continue to the next level'
-    modalButtons.innerHTML = '<button class="level-picker" title="Hard" onclick="init(144,32)">Admiral</button>'
+    modalButtons.innerHTML = `<button class="level-picker" title="${currLevel.difficulty}" onclick="init(${currLevel.field},${currLevel.mines},false)">${currLevel.name}</button>`
     gModal.showModal()
     endGame()
+    if (time < gGame.levels[0].bestTime) newBest(time) 
+}
+
+function finishGame(title,talk,buttons,time){
+
+    title.innerText = 'WELL DONE SOLDIER!'
+    talk.innerText = 'You have cleared 3 fields in just ' + time + '\nThat is impressive'
+    let allLevels = ''
+    for(let i = 0; i < gGame.levels.length; i++){
+        const level = gGame.levels[i]
+        allLevels += `<button class="level-picker" title="${level.difficulty}" onclick="init(${level.field},${level.mines},true)">${level.name}</button>`
+    }
+    buttons.innerHTML = allLevels
     gJsConfetti.addConfetti()
-    if (time < gBestScore[gCurrLevel]) newBest(time) 
 }
 
 function openModal(){
@@ -312,6 +337,7 @@ function timer(){
     return formattedTime
 }
 function endGame(){
+    gClicks.total += gClicks.level
     clearInterval(gTimerInterval)
 }
 //======================================================================================//
