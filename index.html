@@ -17,9 +17,9 @@
 </head>
 <body onload="init(16,2,true)">
     <div class="head-futures">
-        <p onclick="openModal()">Select level</p>
+        <p onclick="levelSelector()">Select level</p>
         |
-        <p >Rules</p>
+        <p onclick="showRules()">Rules</p>
     </div>
     <div class="container">
         <div class="header-container">
@@ -39,7 +39,7 @@
                         <p class="level-name">000</p>
                     </div>
                 </div>
-                <div class="smily" title="RESTART" onclick="init(16,2,true)">😀</div>
+                <div class="smile" title="RESTART" onclick="freshStart(16,2,true)">😀</div>
                 <div class="timer">
                     <p class="small-title">timer</p>
                     <div class="live-data">
@@ -70,6 +70,19 @@
     </div>
     <div><p>created by Ben Klinovsky</p></div>
 
+    <div class="instruction-modal">
+        <div class="instruction-header">
+            <h3 class="instruction">Instruction</h3>
+            <button onclick="showRules()">X</button>
+        </div>
+        <ul class="instruction">
+            <li>Left-click an empty square to reveal it.</li>
+            <li>Right-click an empty square to flag it.</li>
+            <li>To start again press the emoji at the center</li>
+            <li>To skip to a higher level click the top "Select level"</li>
+        </ul>
+    </div>
+
     <dialog class="end-game modal">
         <div class="dialog-container">
             <button class="exit" title="close" onclick="closeModal()">X</button>
@@ -80,7 +93,6 @@
                 <button class="level-picker" title="Easy" onclick="init(16,2)">Privet</button>
                 <button class="level-picker" title="Medium" onclick="init(64,14)">Lieutenant </button>
                 <button class="level-picker" title="Hard" onclick="init(144,32)">Admiral</button>
-                
             </div>
         </div>
     </dialog>

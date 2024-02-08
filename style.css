@@ -105,10 +105,15 @@ p.small-title {
     letter-spacing: 3px;    
 }
 
-.smily {
+.smile {
     grid-area: 1/2/3/3;
     font-size: 3.2rem;
     cursor: pointer;
+    text-shadow: 2px 2px 2px black;
+}
+
+.smile:active {
+    text-shadow: -2px -2px 2px black;
 }
 
 .stats {
@@ -142,6 +147,11 @@ td{
     transition: all 400ms;
     cursor: pointer;
     border: 2px solid;
+    transition: rotate 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.flagged {
+    rotate: 350deg;
 }
 
 .open{
@@ -269,4 +279,29 @@ p {
 
 footer {
     margin: 390px 0 0;
+}
+
+.instruction-modal {
+    background-color: #f0f8fff5;
+    padding: 10px;
+    top: 10px;
+    border: 2px solid black;
+    position: fixed;
+    right: -100%;
+    transition: right 0.3s ease;
+}
+
+.instruction-modal.show{
+    right: 10px;
+}
+
+
+.instruction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+h3.instruction {
+    margin: 10px 0 0 25px;
 }

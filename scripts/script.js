@@ -23,6 +23,8 @@ const gClicks = {level: 0, total: 0}
 const MINE = 'M'
 const EMPTY = 'E'
 const FLAG = '🚩'
+const WIN = '😎'
+const LOSE = '😵'
 
 let gBoard = []
 let gLives = 3
@@ -32,7 +34,6 @@ let gStartTime = Date.now()
 const gJsConfetti = new JSConfetti()
 const gModal = document.querySelector(".modal")
 
-addRightClickFunctionality()
 
 function init(field,mines,fullReset = false){
     CELL.isMine = false
@@ -50,6 +51,7 @@ function init(field,mines,fullReset = false){
 
     setLevelName()
     
+    addRightClickFunctionality()
 }
 
 function doReset(){
@@ -190,6 +192,7 @@ function flag(elm){
     const pos = getPosFromId(elm.id)
     const CurrCell = gBoard[pos.i][pos.j]
     if(CurrCell.isOpen) return
+    elm.classList.toggle("flagged")
     if(CurrCell.isFlagged){
         CurrCell.isFlagged = false
         elm.innerText = CurrCell.isMine ? MINE : EMPTY
@@ -237,17 +240,17 @@ function oops(elm,iPos,jPos){
 }
 
 function checkLose(){
-    if(gLives <= 0){
+    if(gLives <= 1){
         lose()
     } else {
-        gLives--
-        document.querySelector('p.life-left').innerText = gLives
         checkWin()
     }
+    gLives--
+    document.querySelector('p.life-left').innerText = gLives
 }
 
 function lose(){
-    const modalTitle = document.querySelector(".modal .container h3")
+    const modalTitle = document.querySelector(".dialog-container h3")
     //new Audio("media/wrong.wav").play()
     for(let i = 0 ; i < gBoard.length ; i++){
         for(let j = 0 ; j < gBoard[0].length ; j++){
@@ -257,10 +260,14 @@ function lose(){
             }
         }
     }
+    emoji(LOSE)
+    const modalButton = `<button class="level-picker" title="${gGame.levels[0].difficulty}" onclick="init(${gGame.levels[0].field},${gGame.levels[0].mines},true)">${gGame.levels[0].name}</button>`
     setTimeout(()=>{
+        modalSetUp('Game Over', 'you have lost the game\nYou may starts again from the bottom', modalButton)
         modalTitle.innerText = 'Game Over'
         gModal.showModal()
     },1000)
+    endGame()
 }
 
 function checkWin(){
@@ -276,37 +283,39 @@ function checkWin(){
 }
 
 function win(){
-    const modalTitle = document.querySelector(".dialog-container h3")
-    const modalTalk = document.querySelector(".dialog-container .talk")
-    const modalButtons = document.querySelector(".dialog-container .level-container")
+    
     const time = timer()
-
     const currLevelIdx = gGame.levels.findIndex((level)=> level.isCurrent)
+    const currLevel = gGame.levels[currLevelIdx + 1]
+    const modalTitle = 'At ease ' + gGame.levels[currLevelIdx].name
+    const modalTalk = 'You\'ve cleared the field in ' + time + '\nyou may continue to the next level'
+    const modalButtons = `<button class="level-picker" title="${currLevel.difficulty}" onclick="init(${currLevel.field},${currLevel.mines},false)">${currLevel.name}</button>`
     gGame.levels[currLevelIdx].isCurrent = false
+    
+    emoji(WIN)
     if (currLevelIdx === gGame.levels.length - 1 ){
-        finishGame(modalTitle,modalTalk,modalButtons,time)
+        finishGame()
         return
     } 
-    const currLevel = gGame.levels[currLevelIdx + 1]
+
     currLevel.isCurrent = true
-    modalTitle.innerText = 'At ease ' + gGame.levels[currLevelIdx].name
-    modalTalk.innerText = 'You\'ve cleared the field in ' + time + '\nyou may continue to the next level'
-    modalButtons.innerHTML = `<button class="level-picker" title="${currLevel.difficulty}" onclick="init(${currLevel.field},${currLevel.mines},false)">${currLevel.name}</button>`
+    modalSetUp(modalTitle,modalTalk,modalButtons)
     gModal.showModal()
     endGame()
-    if (time < gGame.levels[0].bestTime) newBest(time) 
+    if (time < gGame. levels[0].bestTime) newBest(time) 
 }
 
-function finishGame(title,talk,buttons,time){
-
-    title.innerText = 'WELL DONE SOLDIER!'
-    talk.innerText = 'You have cleared 3 fields in just ' + time + '\nThat is impressive'
+function finishGame(){
+    
+    const title = 'WELL DONE SOLDIER!'
+    const talk = 'You have cleared 3 fields in just ' + time + '\nThat is impressive'
     let allLevels = ''
     for(let i = 0; i < gGame.levels.length; i++){
         const level = gGame.levels[i]
         allLevels += `<button class="level-picker" title="${level.difficulty}" onclick="init(${level.field},${level.mines},true)">${level.name}</button>`
     }
-    buttons.innerHTML = allLevels
+
+    modalSetUp(title,talk,allLevels)
     gJsConfetti.addConfetti()
 }
 
@@ -318,30 +327,11 @@ function closeModal(){
     gModal.close()
 }
 
-function runTimer(){
-    if(gTimerInterval) clearInterval(gTimerInterval)
-    gStartTime = Date.now()
-    gTimerInterval = setInterval(timer,1000)
-}
-
-function timer(){
-    const currentTime = Date.now()
-    const elapsedTime = (currentTime - gStartTime)
-    const seconds = Math.floor(elapsedTime / 1000)
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60;
-    const formattedTime = minutes.toString().padStart(2,0) + ':' + remainingSeconds.toString().padStart(2,0)
-
-    const elTime = document.querySelector(".time-elapsed")
-    elTime.innerText = formattedTime;
-    return formattedTime
-}
 function endGame(){
     gClicks.total += gClicks.level
     clearInterval(gTimerInterval)
 }
 //======================================================================================//
-
 
 function newBest(bestTime){
     //also include level
