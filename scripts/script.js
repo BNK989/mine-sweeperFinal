@@ -1,38 +1,64 @@
 'use strict'
 
-const MINE = {
-    type: 'B',
+const CELL = {
+    isMine: false,
     isOpen: false,
-    isFlagged: false
-}
-const EMPTY = {
-    type: 'E',
-    isOpen: false,
-    isFlagged: false
+    isFlagged: false,
+    minesAround: 0
 }
 
-let gBoard = []
-let gClicks = 0
-let gLives = 3
-let gStartTime = Date.now()
+const gGame = {
+    isOn: false,
+    shownCount: 0,
+    flaggedCount: 0,
+    elapseTime: 0,
+    levels: [{
+     isCurrent: true, name: 'Privet', function: init(16,2), difficulty: 'Easy' },
+    {isCurrent: false, name: 'Lieutenant', function: init(64,14), difficulty: 'Medium' },
+    {isCurrent: false, name: 'Admiral', function: init(144,32), difficulty: 'Hard' }]
+}
 
-const gJsConfetti = new JSConfetti()
-const gModal = document.querySelector(".modal")
-const gElTime = document.querySelector(".timer")
-
-let gBestScore = {
+const gBestScore = {
     16: Infinity,
     25: Infinity,
     36: Infinity
 }
 
+const MINE = 'M'
+const EMPTY = 'E'
+const FLAG = '🚩'
+
+let gBoard = []
+let gClicks = 0
+let gLives = 3
+let gTimerInterval
+let gStartTime = Date.now()
+
+const gJsConfetti = new JSConfetti()
+const gModal = document.querySelector(".modal")
+
+
+
 let gCurrLevel = 16
 
 function init(field,mines){
+    CELL.isMine = false
+    gGame.isOn = true
+    gGame.shownCount = 0
+    gGame.flaggedCount = 0
+    gGame.level = field
+    gClicks = 0
+    closeModal()
+    clearInterval(gTimerInterval)
 
     gBoard = createBoardFromArray(createMines(field,mines))
     renderTable(gBoard)
+    addMineCount()
+    addRightClickFunctionality()
+    
+}
 
+function addRightClickFunctionality(){
     const allTds = document.querySelectorAll('td')
     allTds.forEach((td)=> {
         td.addEventListener('contextmenu', function(ev) {
@@ -40,21 +66,21 @@ function init(field,mines){
             flag(this)
         })
     })
-
-    gClicks = 0
-    gLives = 3
 }
 
 function createMines(field = 16, mines = 2){
     const arr = []
     for(let i = 0; i < field; i++){
         if(i < field - mines){
-            arr.push(structuredClone(EMPTY))
+            arr.push(structuredClone(CELL))
         } else {
-            arr.push(structuredClone(MINE))
+            CELL.isMine = true
+            arr.push(structuredClone(CELL))
         }
     }
+    let temp1 = arr
     shuffle(arr)
+    let temp2 = arr
     return arr
 }
 
@@ -72,15 +98,24 @@ function createBoardFromArray(arr) {
     return board
 }
 
+function addMineCount(){
+    for(let i = 0 ; i < gBoard.length ; i++){
+        for(let j = 0 ; j < gBoard[0].length ; j++){
+            const nbr = totalMines(i,j)
+            gBoard[i][j].minesAround = nbr
+        }
+    }
+    console.table(gBoard)
+}
+
 function renderTable(twoDArr){
     const len = twoDArr.length
-    //const gridSize = Math.sqrt(len)
     let htmlTable = ''
     for(let i = 0 ; i < len; i++){
         htmlTable += '<tr>'
         for(let j = 0 ; j < len; j++){
             const currCell = twoDArr[i][j]
-            htmlTable += `<td id="p${i}at${j}" onclick="play(this, ${i}, ${j})"> ${currCell.type} </td>`
+            htmlTable += `<td id="p${i}at${j}" onclick="play(this, ${i}, ${j})"> ${currCell.isMine ? MINE : EMPTY} </td>`
         }
         htmlTable += '</tr>'
     }
@@ -94,8 +129,7 @@ function totalMines(iPos,jPos){
         for (let j = jPos - 1; j <= jPos + 1; j++) {
             if (j < 0 || j >= gBoard[i].length) continue;
             if (i === iPos && j === jPos) continue;
-            const currCellType = gBoard[i][j].type
-            if (currCellType === MINE.type) nbrCount++;
+            if (gBoard[i][j].isMine) nbrCount++;
         }
     }
     return nbrCount
@@ -103,43 +137,37 @@ function totalMines(iPos,jPos){
 
 function play(elm,iPos,jPos){
 
-    const cell = gBoard[iPos][jPos]
-    if(cell.isOpen) return
-    if(cell.isFlagged) return
-    cell.isOpen = true
+    const currCell = gBoard[iPos][jPos]
+    if(currCell.isOpen) return
+    if(currCell.isFlagged) return
+    currCell.isOpen = true
+    gGame.shownCount++
+    if(gClicks < 1) runTimer()
     
-    switch (cell.type){
-        case MINE.type:
-            if(gClicks < 1){
-                //oops(elm,iPos,jPos)
+    if (currCell.isMine){
+            elm.classList.add("open")
+            if(gClicks < 1 || gGame.shownCount <= 1){
+                oops(elm,iPos,jPos)
                 console.log('oops')
                 return
             }else{
-                gLives--
                 checkLose()
                 console.log('lose')
             }
-            break
+        } else {
 
-            case EMPTY.type:
-                var nbrCount = totalMines(iPos,jPos)
+                var nbrCount = currCell.minesAround
                 if(!elm.classList) elm = document.querySelector(`#p${iPos}at${jPos}`)
                 elm.classList.add("open")
-                //cell.isOpen = true
                 if (nbrCount > 0) {
                     elm.innerHTML = `<div class="has-${nbrCount}-neighbors">${nbrCount}</div>`
                 } else {
-                    clearArea(iPos,jPos)//,150,iPos,jPos)
-                
-            }
-            break
-            default:
-                console.error('issue')
-            } 
+                    clearArea(iPos,jPos)
+                }
+                checkWin()
+        }
             
-        
         gClicks++
-        //if(gRecInterval) clearInterval(gRecInterval)
 }
 
 function clearArea(iPos,jPos){
@@ -157,15 +185,21 @@ function clearArea(iPos,jPos){
 
 function flag(elm){
     const pos = getPosFromId(elm.id)
-    const cell = gBoard[pos.i][pos.j]
-    if(cell.isOpen) return
-    if(cell.isFlagged){
-        cell.isFlagged = false
-        elm.innerText = cell.type
+    const CurrCell = gBoard[pos.i][pos.j]
+    if(CurrCell.isOpen) return
+    if(CurrCell.isFlagged){
+        CurrCell.isFlagged = false
+        elm.innerText = CurrCell.isMine ? MINE : EMPTY
+        gGame.flaggedCount--
      } else {
-        cell.isFlagged = true
-        elm.innerText = '🚩'
+        CurrCell.isFlagged = true
+        elm.innerText = FLAG
+        gGame.flaggedCount++
+        checkWin()
      }
+
+     if(gClicks < 1 )  runTimer()
+     gClicks++
 
 }
 
@@ -176,82 +210,112 @@ function getPosFromId(str){
     }
 }
 
-function oops(elm,iPos,jPos){ //save a user on first click
-//find an empty cell 
-console.log('oops')
+function oops(elm,iPos,jPos){
     
-    while(gBoard[iPos][jPos].type === MINE.type && gClicks < 99){
+    while(gBoard[iPos][jPos].isMine){
         const randI = getRandomInt(0,gBoard.length)
         const randJ = getRandomInt(0,gBoard.length)
         
-        if (gBoard[randI][randJ].type === EMPTY.type){//if found empty
+        if (!gBoard[randI][randJ].isMine){//if found empty
             const holdThis = gBoard[randI][randJ]//empty
             gBoard[randI][randJ] = gBoard[iPos][jPos]//place mine in empty
             gBoard[iPos][jPos] = holdThis
+            //swapped done
+            gBoard[randI][randJ].isOpen = false
+            gGame.shownCount--
             
-            const newElm = document.querySelector(`#p${randI}at${randJ}`)
-
-            //play(newElm,iPos,jPos)
-            
-            
-            return
-            //if(gClicks > 999)return
             //DOM
-            // elm.innerText = EMPTY.type
-            // elm.classList.add("open")
-            // document.querySelector(`#p${i}at${i}`).innerText = gBoard[i][i].type
+            const newElm = document.querySelector(`#p${randI}at${randJ}`)
+            elm.innerText = EMPTY
+            newElm.innerText = MINE
+            play(elm,iPos,jPos)
         }
     }
 }
 
-
 function checkLose(){
-    console.log('function checkLose not created')
-    if(gLives <= 0) lose()
+    if(gLives <= 0){
+        lose()
+    } else {
+        gLives--
+    }
 }
 
 function lose(){
     const modalTitle = document.querySelector(".modal .container h3")
-    new Audio("./media/wrong.wav").play()
-    modalTitle.innerText = 'Game Over'
-    gModal.showModal()
-    //clearInterval(gInterval)
+    //new Audio("media/wrong.wav").play()
+    for(let i = 0 ; i < gBoard.length ; i++){
+        for(let j = 0 ; j < gBoard[0].length ; j++){
+            if (gBoard[i][j].isMine){
+                gBoard[i][j].isOpen = true
+                document.querySelector(`#p${i}at${j}`).classList.add("open")
+            }
+        }
+    }
+    setTimeout(()=>{
+        modalTitle.innerText = 'Game Over'
+        gModal.showModal()
+    },1000)
 }
 
-//======================================================================================//
+function checkWin(){
 
-function runTimer(){
-    gStartTime = Date.now()
-    //gInterval = setInterval(timer,30)
+    for(let i = 0; i < gBoard.length; i++){
+        for(let j = 0; j < gBoard[0].length; j++){
+            if(gBoard[i][j].isMine && !gBoard[i][j].isFlagged && !gBoard[i][j].isOpen) return
+            if(!gBoard[i][j].isMine && !gBoard[i][j].isOpen) return
+        }
+    }
+    win()
+    
 }
-
-function timer(){
-    const currentTime = Date.now()
-    const elapstTime = (currentTime - gStartTime) / 1000
-    const formattedTime = elapstTime.toFixed(3)
-    gElTime.innerText = formattedTime;
-    return formattedTime
-}
-
 
 function win(){
-    const modalTitle = document.querySelector(".modal .container h3")
-    const time = +timer()
+    const modalTitle = document.querySelector(".dialog-container h3")
+    const modalTalk = document.querySelector(".dialog-container .talk")
+    const modalButtons = document.querySelector(".dialog-container .level-container")
+    const time = timer()
     //clearInterval(gInterval)
-    gJsConfetti.addConfetti()
-    modalTitle.innerText = 'DONE! in: ' + time + 's'// and X moves
+    modalTitle.innerText = 'At ease soldier'
+    modalTalk.innerText = 'You\'ve cleared the field in ' + time + '\nyou may continue to the next level'
+    modalButtons.innerHTML = '<button class="level-picker" title="Hard" onclick="init(144,32)">Admiral</button>'
     gModal.showModal()
-
-    if (time < gBestScore[gCurrLevel])  newBest(time) 
+    endGame()
+    gJsConfetti.addConfetti()
+    if (time < gBestScore[gCurrLevel]) newBest(time) 
 }
 
-function gameOver(){
-    //shuts the game --> should be executable from win or lose.
+function openModal(){
+    gModal.showModal()
 }
 
 function closeModal(){
     gModal.close()
 }
+
+function runTimer(){
+    if(gTimerInterval) clearInterval(gTimerInterval)
+    gStartTime = Date.now()
+    gTimerInterval = setInterval(timer,1000)
+}
+
+function timer(){
+    const currentTime = Date.now()
+    const elapsedTime = (currentTime - gStartTime)
+    const seconds = Math.floor(elapsedTime / 1000)
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60;
+    const formattedTime = minutes.toString().padStart(2,0) + ':' + remainingSeconds.toString().padStart(2,0)
+
+    const elTime = document.querySelector(".time-elapsed")
+    elTime.innerText = formattedTime;
+    return formattedTime
+}
+function endGame(){
+    clearInterval(gTimerInterval)
+}
+//======================================================================================//
+
 
 function newBest(bestTime){
     //also include level

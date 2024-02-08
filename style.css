@@ -4,11 +4,12 @@ body{
     background-image: url(media/visuals/white-brick-wall-textured.avif);    
     display: flex;
     justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
 *{
     font-family: Arial, Helvetica, sans-serif;
-
 }
 
 .container{
@@ -18,13 +19,18 @@ body{
     align-items: center;
     width: 600px;
     height: 750px;
-    margin-top: 20px;
     border: 14px solid #534940;
     background-image: url(media/visuals/old-paper.jpeg);
     background-size: cover;
     box-shadow: 9px 5px 11px 3px #00000085;
 }
 
+.head-futures > p {
+    display: inline;
+    cursor: pointer;
+    color: #0000a7;
+    font-size: .8rem;
+}
 .header-container{
     display: flex;
     justify-content: center;
@@ -32,7 +38,8 @@ body{
     width: 100%;
 
     h1{
-        font-family: 'UnifrakturCook', cursive;
+        font-family: 'Stick No Bills', sans-serif;
+        letter-spacing: 10px;
         font-size: 2.5rem;
         color: #331c00;
         text-align: center;
@@ -53,15 +60,49 @@ body{
     padding-bottom: 10px;
 }
 
-.level-container{
+.stats-container > * {
+    width: -webkit-fill-available;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
+}
+
+.stats-container{
+    width: 90%;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
+    align-items: center;
 
     p {
         font-size: 1.2rem;
         padding: 0 10px;
     }
+}
+
+.live-data {
+    border: 2px solid black;
+    width: 100px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+p.small-title {
+    font-size: .8rem;
+}
+
+.live-data > p {
+    font-family: 'Major Mono Display', monospace;
+    font-weight: 600;
+}
+
+.smily {
+    grid-area: 1/2/3/3;
+    font-size: 3.2rem;
+    cursor: pointer;
 }
 
 .stats {
@@ -98,7 +139,7 @@ td{
 }
 
 .open{
-    background-color: #0900ff3b;
+    background-color: #bf720070;
 
     div{
         background-image: url(media/visuals/green-sticker.webp);
@@ -173,8 +214,18 @@ button:active{
 }
 
 dialog {
-    border-radius: 9px;
+    border-radius: 6px;
     height: 30vh;
+    background-image: url(media/visuals/old-paper.jpeg);
+    backdrop-filter: brightness(0.5) hue-rotate(220deg) contrast(10%);
+    background-position: bottom;
+    border: 4px solid #4b4239;
+
+    .dialog-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 }
 
 button.exit {
@@ -186,13 +237,13 @@ button.exit {
 
 h3 {
     margin-top: 0;
-    color: #ef7900
+    color: #2e1900
 }
 
 h4 {
     margin: 2px 0 10px 0;
     font-size: 1.5rem;
-    color: #ef7900;
+    color: #2e1900;
 }
 
 p {
