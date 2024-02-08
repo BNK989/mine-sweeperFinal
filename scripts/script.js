@@ -72,6 +72,7 @@ function addRightClickFunctionality(){
     })
 }
 
+
 function createMines(field = 16, mines = 2){
     const arr = []
     for(let i = 0; i < field; i++){

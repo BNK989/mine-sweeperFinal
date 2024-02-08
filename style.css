@@ -12,18 +12,22 @@ body{
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.container{
+.container {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    width: 600px;
-    height: 750px;
+    width: 100vw;
+    height: 100vh;
+    max-width: 700px;
     border: 14px solid #534940;
     background-image: url(media/visuals/old-paper.jpeg);
     background-size: cover;
+    background-position: center; 
+    box-sizing: border-box;
     box-shadow: 9px 5px 11px 3px #00000085;
 }
+
 
 .head-futures > p {
     display: inline;
@@ -88,7 +92,8 @@ p.level-name {
 
 .live-data {
     border: 2px solid black;
-    width: 140px;
+    max-width: 140px;
+    min-width: 100px;
     height: 25px;
     display: flex;
     justify-content: center;
@@ -194,11 +199,6 @@ td{
     filter: brightness(1.2) invert(0.98) contrast(1.6) hue-rotate(333deg);
 }
 
-
-td:not(.good):hover{
-    background-color: #f3a546;
-}
-
 .good{
     background-color:#ecdcc9;
     color: white;
@@ -287,7 +287,7 @@ footer {
     top: 10px;
     border: 2px solid black;
     position: fixed;
-    right: -100%;
+    right: -120%;
     transition: right 0.3s ease;
 }
 
