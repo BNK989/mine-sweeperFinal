@@ -67,3 +67,30 @@ function timer(){
     return formattedTime
 }
 
+function showBestScore(){
+    const levelsData = JSON.parse(localStorage.getItem('bestTimes'))
+    const level = gGame.currLevel
+    const currBest = levelsData[level].bestTime
+    const elTimeToBeat = document.querySelector('.time-to-beat')
+    if(isNaN(currBest)){
+        elTimeToBeat.innerText = 'Best to far: ' + currBest
+        elTimeToBeat.style.display = 'block'
+    } else {
+        elTimeToBeat.style.display = 'none'
+    }
+}
+
+
+function showSettings(){
+    const btn = '<button onclick="revealAllCells()">Toggle cell view</button>'
+    modalSetUp('Settings','used for QA only', btn)
+    gModal.showModal()
+    console.log('not set yet')
+}
+
+function revealAllCells(){
+    const elTds = document.querySelectorAll('td')
+    elTds.forEach(td => {
+        td.classList.toggle('hide')
+    })
+}

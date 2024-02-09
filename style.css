@@ -157,10 +157,15 @@ td{
     opacity 1s;
 }
 
+.hide{
+    opacity: 0;
+}
+
 .flagged {
     rotate: 350deg;
     opacity: 1;
 }
+
 
 .open{
     background-color: #bf720070;
@@ -313,6 +318,13 @@ h3.instruction {
 .last-life{
     animation: flash 2s infinite;
 }
+
+button.hit-btn {
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+}
+
 
 @keyframes flash {
     0% { background-color: rgba(255, 0, 0, 0.55); }

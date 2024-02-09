@@ -55,13 +55,14 @@ function init(field,mines,fullReset = false){
     addMineCount()//ads nbr count to each cell
 
     setLevelName()
-    
+    showBestScore()    
     addRightClickFunctionality()
 }
 
 function doReset(){
     gClicks.total = 0
     gGame.currLevel = 0
+    if(gTimerInterval) clearInterval(gTimerInterval)
     //gGame.levels[0].isCurrent = true
     //gGame.levels[1].isCurrent = gGame.levels[2].isCurrent = false
     //gLives = 3
@@ -355,18 +356,20 @@ function checkIfNewBest(levelIdx,time){
     let bestTime = gGame.levels[levelIdx].bestTime ;
     if(isNaN(bestTime)) bestTime = +(+bestTime.substring(0,2)*60 +bestTime.substring(3))
 
-    
     const timeToSeconds = +(+time.substring(0,2)*60 +time.substring(3))
 
     if(timeToSeconds < bestTime){
         gGame.levels[levelIdx].bestTime = time
-        saveToLocal()
+        saveToLocal(levelIdx)
         console.log('new Best ' + time)
     }
     
     gJsConfetti.addConfetti()
 }
 
-function saveToLocal(){
-    localStorage.levels = gGame.levels
+function saveToLocal(levelIdx){
+    //localStorage.level+ = structuredClone(gGame.levels)
+    localStorage.setItem('bestTimes', JSON.stringify(gGame.levels))
+    console.log('saved')
+    //retrieve Method JSON.parse(localStorage.bestTimes)
 }
