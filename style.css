@@ -152,15 +152,19 @@ td{
     transition: all 400ms;
     cursor: pointer;
     border: 2px solid;
-    transition: rotate 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    opacity: 0.2;
+    transition: rotate 1s cubic-bezier(0.68, -0.55, 0.27, 1.55),
+    opacity 1s;
 }
 
 .flagged {
     rotate: 350deg;
+    opacity: 1;
 }
 
 .open{
     background-color: #bf720070;
+    opacity: 1;
 
     div{
         background-image: url(media/visuals/green-sticker.webp);
@@ -231,7 +235,7 @@ button:active{
 
 dialog {
     border-radius: 6px;
-    height: 30vh;
+    height: 20vh;
     background-image: url(media/visuals/old-paper.jpeg);
     backdrop-filter: brightness(0.5) hue-rotate(220deg) contrast(10%);
     background-position: bottom;
@@ -304,4 +308,14 @@ footer {
 
 h3.instruction {
     margin: 10px 0 0 25px;
+}
+
+.last-life{
+    animation: flash 2s infinite;
+}
+
+@keyframes flash {
+    0% { background-color: rgba(255, 0, 0, 0.55); }
+    50% { background-color: inherit; }
+    100% { background-color: rgba(255, 0, 0, 0.55);; }
 }

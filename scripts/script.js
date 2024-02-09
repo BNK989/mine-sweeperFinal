@@ -12,6 +12,7 @@ const gGame = {
     shownCount: 0,
     flaggedCount: 0,
     elapseTime: 0,
+    currLevel: 0,
     levels: [{
      isCurrent: true, name: 'Privet', field: 16, mines: 2, difficulty: 'Easy', bestTime: Infinity },
     {isCurrent: false, name: 'Lieutenant', field: 64, mines: 14, difficulty: 'Medium', bestTime: Infinity },
@@ -25,6 +26,10 @@ const EMPTY = 'E'
 const FLAG = '🚩'
 const WIN = '😎'
 const LOSE = '😵'
+
+const sounds = {whoosh: new Audio('media/audio/whoosh.mp3'),
+                blast: new Audio('media/audio/blast.mp3')
+}
 
 let gBoard = []
 let gLives = 3
@@ -56,9 +61,12 @@ function init(field,mines,fullReset = false){
 
 function doReset(){
     gClicks.total = 0
-    gGame.levels[0].isCurrent = true
-    gGame.levels[1].isCurrent = gGame.levels[2].isCurrent = false
-    gLives = 3
+    gGame.currLevel = 0
+    //gGame.levels[0].isCurrent = true
+    //gGame.levels[1].isCurrent = gGame.levels[2].isCurrent = false
+    //gLives = 3
+    document.querySelector('p.life-left').innerText = gLives = 3
+    document.querySelector('.life-left > .live-data').classList.remove('last-life')
 
 }
 
@@ -110,7 +118,6 @@ function addMineCount(){
             gBoard[i][j].minesAround = nbr
         }
     }
-    console.table(gBoard)
 }
 
 function renderTable(twoDArr){
@@ -148,29 +155,29 @@ function play(elm,iPos,jPos){
     if(!gGame.isOn) return
     currCell.isOpen = true
     gGame.shownCount++
-    if(gClicks.level < 1 ) runTimer()
+    if(gClicks.total < 1 && gClicks.level < 1) runTimer()
+    if(!elm.classList) elm = document.querySelector(`#p${iPos}at${jPos}`)
     
     if (currCell.isMine){
             elm.classList.add("open")
             if(gClicks.level < 1 || gGame.shownCount <= 1){
                 oops(elm,iPos,jPos)
-                console.log('oops')
                 return
             }else{
+                sounds.blast.play()
                 checkLose()
-                console.log('lose')
             }
         } else {
 
-                var nbrCount = currCell.minesAround
-                if(!elm.classList) elm = document.querySelector(`#p${iPos}at${jPos}`)
-                elm.classList.add("open")
-                if (nbrCount > 0) {
-                    elm.innerHTML = `<div class="has-${nbrCount}-neighbors">${nbrCount}</div>`
-                } else {
-                    clearArea(iPos,jPos)
-                }
-                checkWin()
+            var nbrCount = currCell.minesAround
+            elm.classList.add("open")
+            if (nbrCount > 0) {
+                elm.innerHTML = `<div class="has-${nbrCount}-neighbors">${nbrCount}</div>`
+            } else {
+                sounds.whoosh.play()
+                clearArea(iPos,jPos)
+            }
+            checkWin()
         }
             
         gClicks.level++
@@ -178,13 +185,14 @@ function play(elm,iPos,jPos){
 
 function clearArea(iPos,jPos){
 
-    
     for (let i = iPos - 1; i <= iPos + 1; i++) {
         if (i < 0 || i >= gBoard.length) continue;
         for (let j = jPos - 1; j <= jPos + 1; j++) {
             if (j < 0 || j >= gBoard[i].length) continue;
             if (i === iPos && j === jPos) continue;
-            play({notObj: ''},i,j)
+            setTimeout(()=>{
+                play({notObj: ''},i,j)
+            },200)
         }
     }
 }
@@ -205,7 +213,7 @@ function flag(elm){
         checkWin()
      }
 
-     if(gClicks.level < 1 )  runTimer()
+     if(gClicks.level < 1 && gClicks.total < 1)  runTimer()
      gClicks.level++
 
 }
@@ -248,27 +256,36 @@ function checkLose(){
     }
     gLives--
     document.querySelector('p.life-left').innerText = gLives
+    if(gLives === 1){
+        document.querySelector('.life-left > .live-data').classList.add('last-life')
+    }
 }
 
 function lose(){
     const modalTitle = document.querySelector(".dialog-container h3")
     //new Audio("media/wrong.wav").play()
+    //opening all bombs
     for(let i = 0 ; i < gBoard.length ; i++){
         for(let j = 0 ; j < gBoard[0].length ; j++){
-            if (gBoard[i][j].isMine){
-                gBoard[i][j].isOpen = true
-                document.querySelector(`#p${i}at${j}`).classList.add("open")
+            const cell = gBoard[i][j]
+            if (cell.isMine){
+                cell.isOpen = true
+                cell.isFlagged = false
+                const elCell = document.querySelector(`#p${i}at${j}`)
+                elCell.classList.add("open")
+                elCell.classList.remove("flagged")
             }
         }
     }
     emoji(LOSE)
-    const modalButton = `<button class="level-picker" title="${gGame.levels[0].difficulty}" onclick="init(${gGame.levels[0].field},${gGame.levels[0].mines},true)">${gGame.levels[0].name}</button>`
+    const levelData = gGame.levels[gGame.currLevel]
+    const modalButton = `<button class="level-picker" title="${levelData.difficulty}" onclick="init(${levelData.field},${levelData.mines},true)">${levelData.name}</button>`
     setTimeout(()=>{
         modalSetUp('Game Over', 'you have lost the game\nYou may starts again from the bottom', modalButton)
         modalTitle.innerText = 'Game Over'
         gModal.showModal()
     },1000)
-    endGame()
+    endGame(true)
 }
 
 function checkWin(){
@@ -286,27 +303,27 @@ function checkWin(){
 function win(){
     
     const time = timer()
-    const currLevelIdx = gGame.levels.findIndex((level)=> level.isCurrent)
-    const currLevel = gGame.levels[currLevelIdx + 1]
-    const modalTitle = 'At ease ' + gGame.levels[currLevelIdx].name
-    const modalTalk = 'You\'ve cleared the field in ' + time + '\nyou may continue to the next level'
-    const modalButtons = `<button class="level-picker" title="${currLevel.difficulty}" onclick="init(${currLevel.field},${currLevel.mines},false)">${currLevel.name}</button>`
-    gGame.levels[currLevelIdx].isCurrent = false
-    
-    emoji(WIN)
-    if (currLevelIdx === gGame.levels.length - 1 ){
-        finishGame()
+    const levelIdx = gGame.currLevel
+    if (levelIdx === gGame.levels.length - 1 ){
+        finishGame(time)
         return
-    } 
+    }
+    gGame.levels[levelIdx].isCurrent = false
+    gGame.currLevel++
+    gGame.levels[gGame.currLevel].isCurrent = true
+    const currLevel = gGame.levels[gGame.currLevel]
+    const modalTitle = 'You\'ve been promoted to ' + currLevel.name
+    const modalTalk = 'You\'ve cleared the field in ' + time + '\nyou may continue to the next level'
+    const modalButtons = `<button class="level-picker" title="${currLevel.difficulty}" onclick="init(${currLevel.field},${currLevel.mines},false)">PLAY ${currLevel.difficulty}</button>`
+    emoji(WIN)
 
-    currLevel.isCurrent = true
     modalSetUp(modalTitle,modalTalk,modalButtons)
     gModal.showModal()
-    endGame()
-    if (time < gGame. levels[0].bestTime) newBest(time) 
+    endGame(false)
+    checkIfNewBest(levelIdx,time)
 }
 
-function finishGame(){
+function finishGame(time){
     
     const title = 'WELL DONE SOLDIER!'
     const talk = 'You have cleared 3 fields in just ' + time + '\nThat is impressive'
@@ -315,8 +332,9 @@ function finishGame(){
         const level = gGame.levels[i]
         allLevels += `<button class="level-picker" title="${level.difficulty}" onclick="init(${level.field},${level.mines},true)">${level.name}</button>`
     }
-
+    endGame(true)
     modalSetUp(title,talk,allLevels)
+    gModal.showModal()
     gJsConfetti.addConfetti()
 }
 
@@ -328,20 +346,27 @@ function closeModal(){
     gModal.close()
 }
 
-function endGame(){
+function endGame(killInterval = false){
     gClicks.total += gClicks.level
-    clearInterval(gTimerInterval)
+    if(killInterval) clearInterval(gTimerInterval)
 }
-//======================================================================================//
 
-function newBest(bestTime){
-    //also include level
-    console.log('New best' + gCurrLevel)
-    gBestScore[gCurrLevel] = bestTime;
-    const elModalTitle = document.querySelector(".modal .container h3")
-    const elBestTime = document.querySelector("span.best-time")
+function checkIfNewBest(levelIdx,time){
+    let bestTime = gGame.levels[levelIdx].bestTime ;
+    if(isNaN(bestTime)) bestTime = +(+bestTime.substring(0,2)*60 +bestTime.substring(3))
 
-    elModalTitle.innerText = 'New Record!: ' + bestTime + 's'
-    elBestTime.innerText = bestTime
+    
+    const timeToSeconds = +(+time.substring(0,2)*60 +time.substring(3))
 
+    if(timeToSeconds < bestTime){
+        gGame.levels[levelIdx].bestTime = time
+        saveToLocal()
+        console.log('new Best ' + time)
+    }
+    
+    gJsConfetti.addConfetti()
+}
+
+function saveToLocal(){
+    localStorage.levels = gGame.levels
 }

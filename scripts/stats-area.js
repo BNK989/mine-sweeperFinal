@@ -66,3 +66,4 @@ function timer(){
     elTime.innerText = formattedTime;
     return formattedTime
 }
+
