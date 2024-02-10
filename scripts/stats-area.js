@@ -75,7 +75,7 @@ function showBestScore(){
     const currBest = levelsData[level].bestTime
     const elTimeToBeat = document.querySelector('.time-to-beat')
     if(isNaN(currBest)){
-        elTimeToBeat.innerText = 'Best to far: ' + currBest
+        elTimeToBeat.innerText = 'Best so far: ' + currBest
         elTimeToBeat.style.display = 'block'
     } else {
         elTimeToBeat.style.display = 'none'

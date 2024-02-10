@@ -9,6 +9,7 @@ const CELL = {
 
 const gGame = {
   isOn: false,
+  hintActive: false,
   shownCount: 0,
   flaggedCount: 0,
   elapseTime: 0,
@@ -83,14 +84,15 @@ function doReset(levelIdx = 0) {
   gGame.currLevel = levelIdx;
   if (gTimerInterval) clearInterval(gTimerInterval);
   gLives = 3;
+  gGame.hintActive = false
   document.querySelector("p.life-left").innerText = gLives = 3;
   document
     .querySelector(".life-left > .live-data")
     .classList.remove("last-life");
   document.querySelector("p.time-elapsed").innerText = "00:00";
+  document.querySelector("div.hints > .live-data").innerHTML = '<button onclick="hint(this)" class="hint-btn">💡</button>'.repeat(3)
 }
 
-///TESTING
 function createEmptyBoard(field = 16) {
   gBoard = [];
   for (let i = 0; i < Math.sqrt(field); i++) {
@@ -124,8 +126,6 @@ function CheckIfFirstMove(iPos, jPos) {
   runTimer();
   addRightClickFunctionality();
 }
-
-//END TESTING
 
 function addMineCount() {
   for (let i = 0; i < gBoard.length; i++) {
@@ -172,9 +172,13 @@ function play(elm, iPos, jPos) {
   if (currCell.isFlagged) return;
   if (!gGame.isOn) return;
   if (gClicks.level < 1) {
-    CheckIfFirstMove(iPos, jPos);
-    elm = document.querySelector(`#p${iPos}at${jPos}`);
-  }
+      CheckIfFirstMove(iPos, jPos);
+      elm = document.querySelector(`#p${iPos}at${jPos}`);
+    }
+    if (gGame.hintActive){
+        playHint(iPos, jPos)
+        return
+    }
   gGame.shownCount++;
 
   if (!elm.classList) elm = document.querySelector(`#p${iPos}at${jPos}`);
@@ -378,4 +382,31 @@ function saveToLocal(levelIdx) {
   localStorage.setItem("bestTimes", JSON.stringify(gGame.levels));
   console.log("saved");
   //retrieve Method JSON.parse(localStorage.bestTimes)
+}
+
+function hint(elHint){
+    gGame.hintActive = true
+    elHint.classList.add('active')
+    elHint.removeAttribute('onclick')
+}
+
+
+function playHint(iPos, jPos){
+
+    for (let i = iPos - 1; i <= iPos + 1; i++) {
+        if (i < 0 || i >= gBoard.length) continue;
+        for (let j = jPos - 1; j <= jPos + 1; j++) {
+          if (j < 0 || j >= gBoard[i].length) continue;
+          if(gBoard[i][j].isMine) {
+            document.getElementById(`p${i}at${j}`).innerText = MINE
+            setTimeout(()=>document.getElementById(`p${i}at${j}`).innerText = EMPTY,1000)
+          }
+        }
+      }
+      gGame.hintActive = false
+
+      const elHint = document.querySelector('.active')
+      elHint.classList.remove('active')
+      elHint.classList.add('clicked')
+
 }
