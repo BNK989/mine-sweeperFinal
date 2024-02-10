@@ -1,108 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="media/visuals/favicon.ico" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Stick+No+Bills:wght@300&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="media/visuals/favicon.ico"
+      type="image/x-icon"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Stick+No+Bills:wght@300&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"
+    ></script>
 
     <title>Mine Sweeper</title>
-</head>
-<body onload="init(16,2,true)">
+  </head>
+  <body onload="init(0,true)">
     <div class="head-futures">
-        <p onclick="levelSelector()">Select level</p>
-        |
-        <p onclick="showRules()">Rules</p>
-        |
-        <p onclick="showSettings()">Settings</p>
+      <p onclick="levelSelector()">Select level</p>
+      |
+      <p onclick="showRules()">Rules</p>
+      |
+      <p onclick="showSettings()">Settings</p>
     </div>
     <div class="container">
-        <div class="header-container">
-            <h1 class="title">MINE SWEEPER</h1>
-        </div>
-        <div class="score-container">
-            <div class="stats-container">
-                <div class="hints">
-                    <p class="small-title">Hints</p>
-                    <div class="live-data">
-                        <button class="hit-btn">💡</button>
-                        <button class="hit-btn">💡</button>
-                        <button class="hit-btn">💡</button>
-
-                    </div>
-                </div>
-                <div class="current-level">
-                    <p class="small-title">current level</p>
-                    <div class="live-data">
-                        <p class="level-name">000</p>
-                    </div>
-                </div>
-                <div class="smile" title="RESTART" onclick="freshStart(16,2,true)">😀</div>
-                <div class="timer">
-                    <p class="small-title">timer</p>
-                    <div class="live-data">
-                        <p class="time-elapsed">00:00</p>
-                    </div>
-                </div>
-                <div class="life-left">
-                    <p class="small-title">life</p>
-                    <div class="live-data">
-                        <p class="life-left">3</p>
-                    </div>
-                </div>
+      <div class="header-container">
+        <h1 class="title">MINE SWEEPER</h1>
+      </div>
+      <div class="score-container">
+        <div class="stats-container">
+          <div class="hints">
+            <p class="small-title">Hints</p>
+            <div class="live-data">
+              <button onclick="hint(this)" class="hint-btn">💡</button>
+              <button onclick="hint(this)" class="hint-btn">💡</button>
+              <button onclick="hint(this)" class="hint-btn">💡</button>
             </div>
+          </div>
+          <div class="current-level">
+            <p class="small-title">current level</p>
+            <div class="live-data">
+              <p class="level-name">000</p>
+            </div>
+          </div>
+          <div class="smile" title="RESTART" onclick="freshStart(16,2,true)">
+            😀
+          </div>
+          <div class="timer">
+            <p class="small-title">timer</p>
+            <div class="live-data">
+              <p class="time-elapsed">00:00</p>
+            </div>
+          </div>
+          <div class="life-left">
+            <p class="small-title">life</p>
+            <div class="live-data">
+              <p class="life-left">3</p>
+            </div>
+          </div>
         </div>
-        <div class="time-to-beat">Time to beat <span class="best-time">10</span>s</div>
-        <div class="game-container">
-            <table>
-                <tr><td></td><td></td><td></td><td></td></tr>
-                <tr><td></td><td></td><td></td><td></td></tr>
-                <tr><td></td><td></td><td></td><td></td></tr>
-                <tr><td></td><td></td><td></td><td></td></tr>
-            </table>
-        </div>
-        <div class="btn-container">
-        </div>
-        <footer>
-        </footer>
+      </div>
+      <div class="time-to-beat">
+        Time to beat <span class="best-time">10</span>s
+      </div>
+      <div class="game-container">
+        <table>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </table>
+      </div>
+      <div class="btn-container"></div>
+      <footer></footer>
     </div>
     <div><p>created by Ben Klinovsky</p></div>
 
     <div class="instruction-modal">
-        <div class="instruction-header">
-            <h3 class="instruction">Instruction</h3>
-            <button onclick="showRules()">X</button>
-        </div>
-        <ul class="instruction">
-            <li>Left-click an empty square to reveal it.</li>
-            <li>Right-click an empty square to flag it.</li>
-            <li>To start again press the emoji at the center</li>
-            <li>To skip to a higher level click the top "Select level"</li>
-        </ul>
+      <div class="instruction-header">
+        <h3 class="instruction">Instruction</h3>
+        <button onclick="showRules()">X</button>
+      </div>
+      <ul class="instruction">
+        <li>Left-click an empty square to reveal it.</li>
+        <li>Right-click an empty square to flag it.</li>
+        <li>To start again press the emoji at the center</li>
+        <li>To skip to a higher level click the top "Select level"</li>
+      </ul>
     </div>
 
     <dialog class="end-game modal">
-        <div class="dialog-container">
-            <button class="exit" title="close" onclick="closeModal()">X</button>
-            <h3>Game Over</h3>
-            <p class="talk"></p>
-            <!-- <h4>Play Again</h4> -->
-            <div class="level-container">
-                <button class="level-picker" title="Easy" onclick="init(16,2)">Privet</button>
-                <button class="level-picker" title="Medium" onclick="init(64,14)">Lieutenant </button>
-                <button class="level-picker" title="Hard" onclick="init(144,32)">Admiral</button>
-            </div>
+      <div class="dialog-container">
+        <button class="exit" title="close" onclick="closeModal()">X</button>
+        <h3>Game Over</h3>
+        <p class="talk"></p>
+        <!-- <h4>Play Again</h4> -->
+        <div class="level-container">
+          <button class="level-picker" title="Easy" onclick="init(16,2)">
+            Privet
+          </button>
+          <button class="level-picker" title="Medium" onclick="init(64,14)">
+            Lieutenant
+          </button>
+          <button class="level-picker" title="Hard" onclick="init(144,32)">
+            Admiral
+          </button>
         </div>
+      </div>
     </dialog>
     <script defer src="scripts/utils.js"></script>
     <script defer src="scripts/stats-area.js"></script>
     <script defer src="scripts/script.js"></script>
-</body>
+  </body>
 </html>
