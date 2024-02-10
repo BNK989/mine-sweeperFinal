@@ -1,7 +1,7 @@
 'use strict'
 
 function setLevelName(){
-    const level = gGame.levels.find((level)=> level.isCurrent)
+    const level = gGame.levels[gGame.currLevel]
     const nameArea = document.querySelector('.level-name')
 
     nameArea.innerText = level.name
@@ -19,15 +19,16 @@ function emoji(mode){
 }
 
 function freshStart(){
-    const button = `<button class="level-picker" title="easy" onclick="init(16,2,true)">Restart</button>`
+    const button = `<button class="level-picker" title="easy" onclick="init(0,true)">Restart</button>`
     modalSetUp('Are you sure', 'This will completely restart the game all progress will be lost.',button)
     gModal.showModal()
 }
 
 function levelSelector(){
     let buttons = ''
-    for(let level of gGame.levels){
-       buttons += `<button class="level-picker" title="${level.difficulty}" onclick="init(${level.field},${level.mines},true)">${level.name}</button>`
+    for(let i = 0; i < gGame.levels.length; i++){
+        const level = gGame.levels[i]
+       buttons += `<button class="level-picker" title="${level.difficulty}" onclick="init(${i},true)">${level.name}</button>`
     }
     modalSetUp('Select level', 'Choose the rank you want to play', buttons)
     gModal.showModal()
@@ -69,6 +70,7 @@ function timer(){
 
 function showBestScore(){
     const levelsData = JSON.parse(localStorage.getItem('bestTimes'))
+    if (!levelsData) return
     const level = gGame.currLevel
     const currBest = levelsData[level].bestTime
     const elTimeToBeat = document.querySelector('.time-to-beat')

@@ -52,3 +52,13 @@ function shuffle(array) {
   
     return array
   }
+
+  function addRightClickFunctionality() {
+    const allTds = document.querySelectorAll("td");
+    allTds.forEach((td) => {
+      td.addEventListener("contextmenu", function (ev) {
+        ev.preventDefault();
+        flag(this);
+      });
+    });
+  }
